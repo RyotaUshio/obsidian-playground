@@ -1,4 +1,4 @@
-import { Plugin } from 'obsidian';
+import { App, Component, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownRenderer, Plugin } from 'obsidian';
 // import { MyPluginSettings, DEFAULT_SETTINGS, SampleSettingTab } from 'settings';
 
 
@@ -10,20 +10,11 @@ export default class MyPlugin extends Plugin {
 		// await this.saveSettings();
 		// this.addSettingTab(new SampleSettingTab(this));
 
-		const postProcessor = (source: string, containerEl: HTMLElement) => {
-			if (source.split('\n')[0].trim() === '///') {
-				const el = containerEl.createDiv('playground');
-				try {
-					new Function('el', source)(el);
-				} catch (err) {
-					el.setText(err);
-					el.addClass('error');
-					console.error(err);
-				}
-			}
+		const postProcessor = (source: string, containerEl: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+			ctx.addChild(new PlaygroundRenderChild(this, containerEl, source));
 		}
 
-		this.registerMarkdownCodeBlockProcessor('javascript', postProcessor);
+		// this.registerMarkdownCodeBlockProcessor('javascript', postProcessor);
 		this.registerMarkdownCodeBlockProcessor('js', postProcessor);
 	}
 
@@ -34,4 +25,41 @@ export default class MyPlugin extends Plugin {
 	// async saveSettings() {
 	// 	await this.saveData(this.settings);
 	// }
+}
+
+
+class PlaygroundRenderChild extends MarkdownRenderChild {
+	app: App;
+	plugin: MyPlugin;
+	source: string;
+
+	constructor(plugin: MyPlugin, containerEl: HTMLElement, source: string) {
+		super(containerEl);
+		this.app = plugin.app;
+		this.plugin = plugin;
+		this.source = source;
+	}
+
+	async onload() {
+		const lines = this.source.split('\n');
+		const firstLine = lines[0].trim();
+		const sourceBody = firstLine === '///' ? lines.slice(1).join('\n') : this.source;
+
+		const codeEl = this.containerEl.createDiv('playground-code');
+		await MarkdownRenderer.render(
+			this.app, '```javascript\n' + sourceBody + '\n```',
+			codeEl, '', this.plugin
+		);
+
+		if (firstLine === '///') {
+			const el = this.containerEl.createDiv('playground');
+			try {
+				new Function('el', sourceBody)(el);
+			} catch (err) {
+				el.setText(err);
+				el.addClass('error');
+				console.error(err);
+			}
+		}
+	}
 }
