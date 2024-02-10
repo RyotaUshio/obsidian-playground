@@ -1,21 +1,29 @@
 import { Plugin } from 'obsidian';
-import { MyPluginSettings, DEFAULT_SETTINGS, SampleSettingTab } from 'settings';
+// import { MyPluginSettings, DEFAULT_SETTINGS, SampleSettingTab } from 'settings';
 
 
 export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+	// settings: MyPluginSettings;
 
 	async onload() {
-		await this.loadSettings();
-		await this.saveSettings();
-		this.addSettingTab(new SampleSettingTab(this));
+		// await this.loadSettings();
+		// await this.saveSettings();
+		// this.addSettingTab(new SampleSettingTab(this));
+
+		this.registerMarkdownCodeBlockProcessor('javascript', (source, el) => {
+			new Function('el', source)(el);
+		});
+
+		this.registerMarkdownCodeBlockProcessor('js', (source, el) => {
+			new Function('el', source)(el);
+		});
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
+	// async loadSettings() {
+	// 	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	// }
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+	// async saveSettings() {
+	// 	await this.saveData(this.settings);
+	// }
 }
