@@ -11,11 +11,17 @@ export default class MyPlugin extends Plugin {
 		// this.addSettingTab(new SampleSettingTab(this));
 
 		this.registerMarkdownCodeBlockProcessor('javascript', (source, el) => {
-			new Function('el', source)(el);
+			if (source.split('\n')[0].trim() === '///') {
+				el.addClass('playground');
+				new Function('el', source)(el);
+			}
 		});
 
 		this.registerMarkdownCodeBlockProcessor('js', (source, el) => {
-			new Function('el', source)(el);
+			if (source.split('\n')[0].trim() === '///') {
+				el.addClass('playground');
+				new Function('el', source)(el);
+			}
 		});
 	}
 
