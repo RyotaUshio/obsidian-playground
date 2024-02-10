@@ -2,3 +2,8 @@
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-s);
 }
+
+.playground.error {
+    font-family: var(--font-monospace);
+    background-color: var(--background-modifier-error);
+}

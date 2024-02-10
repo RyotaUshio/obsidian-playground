@@ -1,6 +1,6 @@
 # Obsidian JavaScript Playground
 
-Transform `javascript` and `js` code blocks into interactive playground.
+Transform `javascript` and `js` code blocks into interactive playgrounds.
 
 To indicate a code block should be processed by this plugin, start it with a line containing only an empty comment with three slashes `///`.
 

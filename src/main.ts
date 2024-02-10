@@ -10,19 +10,21 @@ export default class MyPlugin extends Plugin {
 		// await this.saveSettings();
 		// this.addSettingTab(new SampleSettingTab(this));
 
-		this.registerMarkdownCodeBlockProcessor('javascript', (source, el) => {
+		const postProcessor = (source: string, containerEl: HTMLElement) => {
 			if (source.split('\n')[0].trim() === '///') {
-				el.addClass('playground');
-				new Function('el', source)(el);
+				const el = containerEl.createDiv('playground');
+				try {
+					new Function('el', source)(el);
+				} catch (err) {
+					el.setText(err);
+					el.addClass('error');
+					console.error(err);
+				}
 			}
-		});
+		}
 
-		this.registerMarkdownCodeBlockProcessor('js', (source, el) => {
-			if (source.split('\n')[0].trim() === '///') {
-				el.addClass('playground');
-				new Function('el', source)(el);
-			}
-		});
+		this.registerMarkdownCodeBlockProcessor('javascript', postProcessor);
+		this.registerMarkdownCodeBlockProcessor('js', postProcessor);
 	}
 
 	// async loadSettings() {
